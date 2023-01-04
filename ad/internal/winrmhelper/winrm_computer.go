@@ -75,7 +75,7 @@ func (m *Computer) Create(conf *config.ProviderConf) (string, error) {
 	if m.Name == "" {
 		return "", fmt.Errorf("Computer.Create: missing name variable")
 	}
-	cmd := fmt.Sprintf("New-ADComputer -Passthru -Name %q", m.Name)
+	cmd := fmt.Sprintf("Start-Sleep -Milliseconds (Get-Random -Minimum 500 -max 10000); New-ADComputer -Passthru -Name %q; Start-Sleep -Milliseconds (Get-Random -Minimum 500 -max 2000)", m.Name)
 
 	if m.SAMAccountName != "" {
 		cmd = fmt.Sprintf("%s -SamAccountName %q", cmd, m.SAMAccountName)
@@ -183,7 +183,7 @@ func (m *Computer) Update(conf *config.ProviderConf, changes map[string]interfac
 
 // Delete deletes an existing Computer objects from the AD tree
 func (m *Computer) Delete(conf *config.ProviderConf) error {
-	cmd := fmt.Sprintf("Remove-ADComputer -confirm:$false -Identity %q", m.GUID)
+	cmd := fmt.Sprintf("Remove-ADObject -Confirm:$false -Recursive -Identity %q", m.GUID)
 	conn, err := conf.AcquireWinRMClient()
 	if err != nil {
 		return fmt.Errorf("while acquiring winrm client: %s", err)
